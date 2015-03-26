@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using PostSharp.Aspects;
 using System.Collections;
+using System.ComponentModel;
+using Nucleus.Data;
 
 namespace CacheAspect
 {
@@ -84,18 +86,34 @@ namespace CacheAspect
 
         private static void BuildDefaultKey(object argument, StringBuilder cacheKeyBuilder)
         {
-            if (argument != null && typeof(ICollection).IsAssignableFrom(argument.GetType()))
+            var os = argument as ICollection;
+            if (os != null)
             {
                 cacheKeyBuilder.Append("{");
-                foreach (object o in (ICollection)argument)
+                foreach (var o in os)
                 {
                     cacheKeyBuilder.Append(o ?? "Null");
                 }
                 cacheKeyBuilder.Append("}");
             }
+            else if (argument != null)
+            {
+                var argType = argument.GetType();
+
+                var sto = Attribute.GetCustomAttribute(argType, typeof (Nucleus.Data.StronglyTypedObjectAttribute)) as StronglyTypedObjectAttribute;
+                if (sto == null)
+                {
+                    cacheKeyBuilder.Append(argument ?? "Null");
+                }
+                else
+                {
+                    var v = DynamicCast(argument, sto.BaseObjectType);
+                    cacheKeyBuilder.Append(string.Concat(argType, ":", v ?? "Null"));
+                }
+            }
             else
             {
-                cacheKeyBuilder.Append(argument ?? "Null");
+                cacheKeyBuilder.Append("Null");
             }
         }
 
@@ -107,7 +125,21 @@ namespace CacheAspect
             return paramKeyValue.Key;
 
         }
-     
+
+        private static MethodInfo GetMethod(Type toSearch, string methodName, Type returnType, BindingFlags bindingFlags)
+        {
+            return Array.Find(toSearch.GetMethods(bindingFlags), inf => inf.Name == methodName && inf.ReturnType == returnType);
+        }
+
+        public static object DynamicCast(object o, Type ot)
+        {
+            var method = GetMethod(o.GetType(), "op_Implicit", ot, BindingFlags.Static | BindingFlags.Public) ??
+                         GetMethod(o.GetType(), "op_Explicit", ot, BindingFlags.Static | BindingFlags.Public);
+
+            if (method == null) throw new InvalidCastException("Invalid Cast.");
+
+            return method.Invoke(null, new[] { o });
+        }
     }
 
     public enum CacheSettings { Default, IgnoreParameters, UseId, UseProperty, IgnoreTTL };
