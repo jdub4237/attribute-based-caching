@@ -1,4 +1,4 @@
-﻿namespace CacheAspect
+﻿namespace CacheAspect.Implementations
 {
     //primarly used for unit tests
     public class NoCache : ICache

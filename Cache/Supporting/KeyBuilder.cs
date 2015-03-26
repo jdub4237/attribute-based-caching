@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using PostSharp.Aspects;
-using System.Collections;
-using System.ComponentModel;
 using Nucleus.Data;
+using Nucleus.JetBrains;
+using PostSharp.Aspects;
 
-namespace CacheAspect
+namespace CacheAspect.Supporting
 {
     [Serializable]
     public class KeyBuilder
@@ -22,6 +22,7 @@ namespace CacheAspect
         private ParameterInfo[] _methodParameters;
         public ParameterInfo[] MethodParameters
         {
+            [UsedImplicitly] 
             get { return _methodParameters; }
             set { 
                 _methodParameters = value;
@@ -29,7 +30,7 @@ namespace CacheAspect
             }
         }
 
-        private void TransformParametersIntoNameValueMapper(ParameterInfo[] methodParameters)
+        private void TransformParametersIntoNameValueMapper(IReadOnlyList<ParameterInfo> methodParameters)
         {
             _parametersNameValueMapper = new Dictionary<int, string>();
             for (var i = 0; i < methodParameters.Count(); i++)
@@ -43,14 +44,7 @@ namespace CacheAspect
             StringBuilder cacheKeyBuilder = new StringBuilder();
 
             // start building a key based on the method name if a group name not set
-            if (string.IsNullOrWhiteSpace(GroupName))
-            {
-                cacheKeyBuilder.Append(MethodName);
-            }
-            else
-            {
-                cacheKeyBuilder.Append(GroupName);
-            }
+            cacheKeyBuilder.Append(string.IsNullOrWhiteSpace(GroupName) ? MethodName : GroupName);
 
             if (instance != null)
             {
@@ -100,10 +94,10 @@ namespace CacheAspect
             {
                 var argType = argument.GetType();
 
-                var sto = Attribute.GetCustomAttribute(argType, typeof (Nucleus.Data.StronglyTypedObjectAttribute)) as StronglyTypedObjectAttribute;
+                var sto = Attribute.GetCustomAttribute(argType, typeof (StronglyTypedObjectAttribute)) as StronglyTypedObjectAttribute;
                 if (sto == null)
                 {
-                    cacheKeyBuilder.Append(argument ?? "Null");
+                    cacheKeyBuilder.Append(argument);
                 }
                 else
                 {
@@ -126,7 +120,7 @@ namespace CacheAspect
 
         }
 
-        private static MethodInfo GetMethod(Type toSearch, string methodName, Type returnType, BindingFlags bindingFlags)
+        private static MethodInfo GetMethod(IReflect toSearch, string methodName, Type returnType, BindingFlags bindingFlags)
         {
             return Array.Find(toSearch.GetMethods(bindingFlags), inf => inf.Name == methodName && inf.ReturnType == returnType);
         }
@@ -142,5 +136,5 @@ namespace CacheAspect
         }
     }
 
-    public enum CacheSettings { Default, IgnoreParameters, UseId, UseProperty, IgnoreTTL };
+    public enum CacheSettings { Default, IgnoreParameters, UseId, UseProperty, IgnoreTtl };
 }

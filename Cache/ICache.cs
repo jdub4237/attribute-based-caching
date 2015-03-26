@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Nucleus.JetBrains;
 
 namespace CacheAspect
 {
@@ -13,6 +10,7 @@ namespace CacheAspect
 
         void Delete(string key);
 
+        [UsedImplicitly]
         void Clear();
     }
 }

@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using CacheAspect.Supporting;
 using PostSharp.Aspects;
-using Microsoft.ApplicationServer.Caching;
 
 namespace CacheAspect.Attributes
 {
@@ -49,7 +46,10 @@ namespace CacheAspect.Attributes
             public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo)
             {
                 KeyBuilder.MethodParameters = method.GetParameters();
-                KeyBuilder.MethodName =  string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+                if (method.DeclaringType != null)
+                {
+                    KeyBuilder.MethodName =  string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+                }
             }
 
             public override void OnExit(MethodExecutionArgs args)

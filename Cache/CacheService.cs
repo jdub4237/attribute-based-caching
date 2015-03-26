@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Configuration;
+using CacheAspect.Implementations;
 
 namespace CacheAspect
 {
@@ -20,35 +20,36 @@ namespace CacheAspect
 
         private static void InitTimeToLive()
         {
-            if (TimeToLive == TimeSpan.Parse("0:0:0:0"))
-            {
-                try
-                {
-                    TimeToLive = TimeSpan.Parse(ConfigurationManager.AppSettings["CacheAspect.TimeToLive"]);
-                }
-                catch
-                {
-                    TimeToLive = TimeSpan.MaxValue;
-                }
+            if (TimeToLive != TimeSpan.Parse("0:0:0:0")) return;
 
+            try
+            {
+                TimeToLive = TimeSpan.Parse(ConfigurationManager.AppSettings["CacheAspect.TimeToLive"]);
+            }
+            catch
+            {
+                TimeToLive = TimeSpan.MaxValue;
             }
         }
 
         private static void InitCache()
         {
-            if (Cache == null)
-            {
-                try
-                {
-                    Cache = (ICache)Activator.CreateInstance(Type.GetType(ConfigurationManager.AppSettings["CacheAspect.CacheType"]));
+            if (Cache != null) return;
 
-                }
-                catch
+            try
+            {
+                var appSetting = ConfigurationManager.AppSettings["CacheAspect.CacheType"];
+                var type = Type.GetType(appSetting);
+                if (type != null)
                 {
-                    //if a cache is not configured, fall back on NoCache 
-                    //this happens is useful for test cases
-                    Cache = new NoCache();
+                    Cache = (ICache)Activator.CreateInstance(type);
                 }
+            }
+            catch
+            {
+                //if a cache is not configured, fall back on NoCache 
+                //this happens is useful for test cases
+                Cache = new NoCache();
             }
         }
 

@@ -1,11 +1,13 @@
 ﻿using System;
 using Microsoft.ApplicationServer.Caching;
+using Nucleus.JetBrains;
 
-namespace CacheAspect
+namespace CacheAspect.Implementations
 {
+    [UsedImplicitly]
     public class OutOfProcessMemoryCache : ICache
     {
-        public static String CacheName = "CacheAttribute";
+        private const String CacheName = "CacheAttribute";
         private static DataCache _cache;
 
         public OutOfProcessMemoryCache()

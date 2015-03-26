@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using Nucleus.JetBrains;
 
-namespace CacheAspect
+namespace CacheAspect.Implementations
 {
+    [UsedImplicitly]
     public class InProcessMemoryCache : ICache
     {
         private readonly ConcurrentDictionary<string, object> _cache = new ConcurrentDictionary<string, object>();

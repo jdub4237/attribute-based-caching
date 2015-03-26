@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Caching;
+using Nucleus.JetBrains;
 
-namespace CacheAspect
+namespace CacheAspect.Implementations
 {
+    [UsedImplicitly]
     public class SystemMemoryCache:ICache
     {
         public object this[string key]

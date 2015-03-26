@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.ApplicationServer.Caching;
-using PostSharp.Aspects;
-using CacheAspect.Supporting;
 using System.Reflection;
+using CacheAspect.Supporting;
+using PostSharp.Aspects;
 
 namespace CacheAspect.Attributes
 {
@@ -29,12 +25,8 @@ namespace CacheAspect.Attributes
                 KeyBuilder.ParameterProperty = parameterProperty;
             }
 
-            public Cacheable(String groupName, CacheSettings settings)
+            public Cacheable(String groupName, CacheSettings settings = CacheSettings.Default)
                 : this(groupName, settings, string.Empty)
-            {
-            }
-
-            public Cacheable(String groupName) : this(groupName, CacheSettings.Default)
             {
             }
 
@@ -48,7 +40,10 @@ namespace CacheAspect.Attributes
             public override void CompileTimeInitialize(MethodBase method, AspectInfo aspectInfo)
             {
                 KeyBuilder.MethodParameters = method.GetParameters();
-                KeyBuilder.MethodName = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+                if (method.DeclaringType != null)
+                {
+                    KeyBuilder.MethodName = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+                }
             }
 
             // This method is executed before the execution of target methods of this aspect.
@@ -88,7 +83,7 @@ namespace CacheAspect.Attributes
 
             private bool IsTooOld(DateTime time)
             {
-                if (KeyBuilder.Settings == CacheSettings.IgnoreTTL)
+                if (KeyBuilder.Settings == CacheSettings.IgnoreTtl)
                 {
                     return false;
                 }

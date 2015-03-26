@@ -65,6 +65,7 @@
     <Compile Include="Attributes\Cacheable.cs" />
     <Compile Include="Attributes\Parameter.cs" />
     <Compile Include="Attributes\TriggerInvalidation.cs" />
+    <Compile Include="Attributes\UsePropertyAttribute.cs" />
     <Compile Include="Implementations\BTreeCache.cs" />
     <Compile Include="CacheService.cs" />
     <Compile Include="ICache.cs" />
