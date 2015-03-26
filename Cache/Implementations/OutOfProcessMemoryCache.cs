@@ -2,7 +2,7 @@
 using Microsoft.ApplicationServer.Caching;
 using Nucleus.JetBrains;
 
-namespace CacheAspect.Implementations
+namespace CacheAspect
 {
     [UsedImplicitly]
     public class OutOfProcessMemoryCache : ICache

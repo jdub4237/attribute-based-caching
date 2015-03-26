@@ -3,7 +3,7 @@ using System.Reflection;
 using CacheAspect.Supporting;
 using PostSharp.Aspects;
 
-namespace CacheAspect.Attributes
+namespace CacheAspect
 {
     public static partial class Cache
     {

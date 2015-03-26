@@ -1,7 +1,7 @@
 ﻿using System;
 using Nucleus.JetBrains;
 
-namespace CacheAspect.Attributes
+namespace CacheAspect
 {
     [AttributeUsage(AttributeTargets.Parameter)]
     public class UsePropertyAttribute : Attribute

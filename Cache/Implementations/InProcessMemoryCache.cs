@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Nucleus.JetBrains;
 
-namespace CacheAspect.Implementations
+namespace CacheAspect
 {
     [UsedImplicitly]
     public class InProcessMemoryCache : ICache

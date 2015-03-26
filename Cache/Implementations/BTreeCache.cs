@@ -2,7 +2,7 @@
 using BplusDotNet;
 using Nucleus.JetBrains;
 
-namespace CacheAspect.Implementations
+namespace CacheAspect
 {
     [UsedImplicitly]
     internal class BTreeCache : ICache

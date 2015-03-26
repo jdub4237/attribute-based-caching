@@ -2,7 +2,7 @@
 using System.Runtime.Caching;
 using Nucleus.JetBrains;
 
-namespace CacheAspect.Implementations
+namespace CacheAspect
 {
     [UsedImplicitly]
     public class SystemMemoryCache:ICache
