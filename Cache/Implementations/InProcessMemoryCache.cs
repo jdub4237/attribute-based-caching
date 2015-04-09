@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Nucleus.JetBrains;
 
 namespace CacheAspect
@@ -28,6 +29,11 @@ namespace CacheAspect
         public void Clear()
         {
             _cache.Clear();
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get { return _cache.Keys; }
         }
     }
 }

@@ -56,6 +56,8 @@ namespace CacheAspect.Supporting
             int argIndex;
             switch (Settings)
             {
+                case CacheSettings.EntireGroup:
+                    return GroupName;
                 case CacheSettings.IgnoreParameters:
                     return cacheKeyBuilder.ToString();
                     
@@ -136,5 +138,13 @@ namespace CacheAspect.Supporting
         }
     }
 
-    public enum CacheSettings { Default, IgnoreParameters, UseId, UseProperty, IgnoreTtl };
+    public enum CacheSettings
+    {
+        Default,
+        IgnoreParameters,
+        UseId,
+        UseProperty,
+        IgnoreTtl,
+        EntireGroup
+    }
 }

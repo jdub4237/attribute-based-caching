@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Microsoft.ApplicationServer.Caching;
 using Nucleus.JetBrains;
 
@@ -9,6 +11,7 @@ namespace CacheAspect
     {
         private const String CacheName = "CacheAttribute";
         private static DataCache _cache;
+        private readonly List<string> _keys = new List<string>();
 
         public OutOfProcessMemoryCache()
         {
@@ -20,7 +23,14 @@ namespace CacheAspect
         public object this[string key]
         {
             get { return _cache[key]; }
-            set { _cache[key] = value; }
+            set
+            {
+                lock (_keys)
+                {
+                    _keys.Add(key);
+                }
+                _cache[key] = value;
+            }
         }
 
 
@@ -33,12 +43,27 @@ namespace CacheAspect
 
         public void Delete(string key)
         {
+            lock (_keys)
+            {
+                _keys.Remove(key);
+            }
             _cache.Remove(key);
         }
 
         public void Clear()
         {
             throw new NotImplementedException("Clearing AppFabric cache has not yet been implemented.");
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                lock (_keys)
+                {
+                    return _keys.ToArray();
+                }
+            }
         }
     }
 }

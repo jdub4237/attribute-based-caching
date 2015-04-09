@@ -1,4 +1,5 @@
-﻿using Nucleus.JetBrains;
+﻿using System.Collections.Generic;
+using Nucleus.JetBrains;
 
 namespace CacheAspect
 {
@@ -12,5 +13,7 @@ namespace CacheAspect
 
         [UsedImplicitly]
         void Clear();
+
+        IEnumerable<string> Keys { get; }
     }
 }

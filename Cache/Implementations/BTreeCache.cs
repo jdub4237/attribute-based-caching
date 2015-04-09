@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using BplusDotNet;
 using Nucleus.JetBrains;
 
@@ -10,6 +11,7 @@ namespace CacheAspect
         private static SerializedTree _treeCache;
         private static string _datafile;
         private static string _treefile;
+        private readonly List<string> _keys = new List<string>();
 
         public BTreeCache()
         {
@@ -26,6 +28,10 @@ namespace CacheAspect
             }
             set
             {
+                lock (_keys)
+                {
+                    _keys.Add(key);
+                }
                 _treeCache[key] = value;
                 SaveCache();
             }
@@ -39,6 +45,10 @@ namespace CacheAspect
 
         public void Delete(string key)
         {
+            lock (_keys)
+            {
+                _keys.Remove(key);
+            }
             _treeCache.RemoveKey(key);
             SaveCache();
         }
@@ -50,6 +60,17 @@ namespace CacheAspect
             {
                 Delete(key);
                 key = _treeCache.FirstKey();
+            }
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                lock (_keys)
+                {
+                    return _keys.ToArray();
+                }
             }
         }
 

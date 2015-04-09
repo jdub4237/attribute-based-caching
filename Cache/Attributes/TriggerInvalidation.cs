@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using CacheAspect.Supporting;
 using PostSharp.Aspects;
@@ -54,9 +55,18 @@ namespace CacheAspect
 
             public override void OnExit(MethodExecutionArgs args)
             {
-                string key = KeyBuilder.BuildCacheKey(args.Instance, args.Arguments);
+                var key = KeyBuilder.BuildCacheKey(args.Instance, args.Arguments);
 
-                if (CacheService.Cache.Contains(key))
+                if (KeyBuilder.Settings == CacheSettings.EntireGroup)
+                {
+                    var keys = CacheService.Cache.Keys;
+
+                    foreach (var k in keys.Where(x => x.StartsWith(key)))
+                    {
+                        CacheService.Cache.Delete(k);
+                    }
+                }
+                else if (CacheService.Cache.Contains(key))
                 {
                     CacheService.Cache.Delete(key);
                 }

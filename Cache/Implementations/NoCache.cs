@@ -1,4 +1,6 @@
-﻿namespace CacheAspect
+﻿using System.Collections.Generic;
+
+namespace CacheAspect
 {
     //primarly used for unit tests
     public class NoCache : ICache
@@ -20,6 +22,14 @@
 
         public void Clear()
         {
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
         }
     }
 }
