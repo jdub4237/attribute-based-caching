@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using CacheAspect;
-using CacheAspect.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestCache
