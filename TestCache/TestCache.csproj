@@ -38,6 +38,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Nucleus, Version=4.6.59.0, Culture=neutral, PublicKeyToken=9e7d61ecea3be335, processorArchitecture=MSIL">
+      <HintPath>..\..\Personal\VeriShip.ContractRerate\VeriShip.Contract2\packages\Nucleus.4.6.59.0\lib\net45\Nucleus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nucleus.Data, Version=4.6.59.0, Culture=neutral, PublicKeyToken=9e7d61ecea3be335, processorArchitecture=MSIL">
+      <HintPath>..\..\Personal\VeriShip.ContractRerate\VeriShip.Contract2\packages\Nucleus.Data.4.6.59.0\lib\net45\Nucleus.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PostSharp, Version=4.1.10.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL">
       <HintPath>..\..\Personal\VeriShip.ContractRerate\VeriShip.Contract2\packages\PostSharp.4.1.10\lib\net35-client\PostSharp.dll</HintPath>
       <Private>True</Private>
@@ -62,8 +70,11 @@
     <Compile Include="IUserDal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequiresPostSharp.cs" />
+    <Compile Include="SuperId.cs" />
     <Compile Include="TestUserRepository.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="UserAddRepository.cs" />
+    <Compile Include="UserGetRepository.cs" />
     <Compile Include="UserRepository.cs" />
   </ItemGroup>
   <ItemGroup>

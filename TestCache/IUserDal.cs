@@ -1,11 +1,14 @@
-﻿using System;
+﻿using System.Collections.Generic;
+
 namespace TestCache
 {
     public interface IUserDal
     {
         void AddUser(User u);
         void DeleteUser(User u);
-        System.Collections.Generic.List<User> GetAllUsers();
+        List<User> GetAllUsers();
         User GetUserById(int id);
+
+        User GetUserBySuperId(SuperId superId);
     }
 }

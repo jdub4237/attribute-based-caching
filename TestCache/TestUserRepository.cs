@@ -10,35 +10,41 @@ namespace TestCache
     public class TestUserRepository
     {
 
-        UserRepository target;
-        IUserDal dal;
-        ICache cache;
+        UserRepository _target;
+
+        UserGetRepository _targetGetRepo;
+        UserAddRepository _targetAddRepo;
+
+        IUserDal _dal;
+        ICache _cache;
 
         // Use TestInitialize to run code before running each test 
         [TestInitialize]
         public void SetUp()
         {
-            dal = MockRepository.GenerateStrictMock<IUserDal>();
-            cache = new InProcessMemoryCache();
+            _dal = MockRepository.GenerateStrictMock<IUserDal>();
+            _cache = new InProcessMemoryCache();
 
-            CacheService.Cache = cache;
-            target = new UserRepository();
-            target.Dal = dal;
+            CacheService.Cache = _cache;
+            _target = new UserRepository {Dal = _dal};
+
+            _targetAddRepo = new UserAddRepository {Dal = _dal};
+            _targetGetRepo = new UserGetRepository {Dal = _dal};
         }
 
         [TestMethod]
         public void GetAllUsers_TryRetrievingDataTwice_DalShouldBeHitOnce()
         {
             //Arrange
-            dal.Expect(d => d.GetAllUsers()).Return(GetUsers());
+            _dal.Expect(d => d.GetAllUsers()).Return(GetUsers());
 
             //Act
-            target.GetAllUsers();
-            target.GetAllUsers();
+            _target.GetAllUsers();
+            _target.GetAllUsers();
 
             //Assert
-            dal.VerifyAllExpectations();
-            
+            _dal.VerifyAllExpectations();
+
         }
 
         [TestMethod]
@@ -46,14 +52,14 @@ namespace TestCache
         {
             //Arrange
             int id = 1;
-            dal.Expect(d => d.GetUserById(id)).Return(GetUsers().First());
+            _dal.Expect(d => d.GetUserById(id)).Return(GetUsers().First());
 
             //Act
-            target.GetUserById(id);
-            target.GetUserById(id);
+            _target.GetUserById(id);
+            _target.GetUserById(id);
 
             //Assert
-            dal.VerifyAllExpectations();
+            _dal.VerifyAllExpectations();
         }
 
         [TestMethod]
@@ -62,33 +68,76 @@ namespace TestCache
             //Arrange
             int id1 = 1;
             int id2 = 2;
-            dal.Expect(d => d.GetUserById(id1)).Return(GetUsers().First());
-            dal.Expect(d => d.GetUserById(id2)).Return(GetUsers().Last());
+            _dal.Expect(d => d.GetUserById(id1)).Return(GetUsers().First());
+            _dal.Expect(d => d.GetUserById(id2)).Return(GetUsers().Last());
 
             //Act
-            target.GetUserById(id1);
-            target.GetUserById(id2);
+            _target.GetUserById(id1);
+            _target.GetUserById(id2);
 
             //Assert
-            dal.VerifyAllExpectations();
+            _dal.VerifyAllExpectations();
         }
 
         [TestMethod]
         public void GetAllUsers_AddUserAfterCaching_CacheShouldBeInvalidated()
         {
             //Arrange
-            dal.Expect(d => d.GetAllUsers())
+            _dal.Expect(d => d.GetAllUsers())
                 .Return(GetUsers())
                 .Repeat.Twice();                    //Second call expected after cache is invalidated
-            dal.Expect(d => d.AddUser(null)).IgnoreArguments();
-            
+            _dal.Expect(d => d.AddUser(null)).IgnoreArguments();
+
             //Act
-            target.GetAllUsers();
-            target.AddUser(new User{ Id = 1234});   //Should trigger invalidation
-            target.GetAllUsers();
+            _target.GetAllUsers();
+            _target.AddUser(new User { Id = 1234 });   //Should trigger invalidation
+            _target.GetAllUsers();
 
             //Assert
-            dal.VerifyAllExpectations();
+            _dal.VerifyAllExpectations();
+        }
+
+        /// <summary>
+        /// New Tests
+        /// </summary>
+        [TestMethod]
+        public void GetAllUsers_AddUserAfterCaching_GroupCacheShouldBeInvalidated_CrossObjects()
+        {
+            //Arrange
+            _dal.Expect(d => d.GetAllUsers())
+                .Return(GetUsers())
+                .Repeat.Twice();                    //Second call expected after cache is invalidated
+            _dal.Expect(d => d.AddUser(null)).IgnoreArguments();
+
+            //Act
+            _targetGetRepo.GetAllUsers();
+            _targetAddRepo.AddUser(new User { Id = 1234 });   //Should trigger invalidation
+            _targetGetRepo.GetAllUsers();
+
+            //Assert
+            _dal.VerifyAllExpectations();
+        }
+
+        [TestMethod]
+        public void GetUserBySuperId_ByTwoIdsTwiceShouldHitCacheOnSecondTryWithCorrectUser()
+        {
+            //Arrange
+            _dal.Expect(d => d.GetUserBySuperId(1))
+                .Return(GetUsers()[0]);          
+            _dal.Expect(d => d.GetUserBySuperId(2))
+                .Return(GetUsers()[1]);
+
+            //Act
+            var ret1 = _targetGetRepo.GetUserBySuperId(1);
+            var ret2 = _targetGetRepo.GetUserBySuperId(2);
+            var ret1a = _targetGetRepo.GetUserBySuperId(1);
+            var ret2a = _targetGetRepo.GetUserBySuperId(2);
+
+            
+            //Assert
+            _dal.VerifyAllExpectations();
+            Assert.AreEqual(ret1, ret1a);
+            Assert.AreEqual(ret2, ret2a);
         }
 
         private TestContext testContextInstance;
@@ -108,12 +157,14 @@ namespace TestCache
                 testContextInstance = value;
             }
         }
+
         private List<User> GetUsers()
         {
-            return new List<User>{ 
-            new User{ Id = 1},
-            new User{ Id = 2}
-        };
+            return new List<User>
+            {
+                new User {Id = 1},
+                new User {Id = 2}
+            };
         }
     }
 }

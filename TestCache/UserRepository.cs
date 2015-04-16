@@ -6,10 +6,10 @@ namespace TestCache
 {
     public class UserRepository
     {
-        public IUserDal Dal{get; set;}
+        public IUserDal Dal { get; set; }
 
         //Get All Users is cached in Key = "GetAllUsers"
-        [Cache.Cacheable("GetAllUsers")] 
+        [Cache.Cacheable("GetAllUsers")]
         public List<User> GetAllUsers()
         {
             return Dal.GetAllUsers();
@@ -34,12 +34,11 @@ namespace TestCache
         //this is done using a bit reflection
         [Cache.TriggerInvalidation("GetAllUsers", CacheSettings.IgnoreParameters)]
         [Cache.TriggerInvalidation("GetUserById", CacheSettings.UseId)]
-         public void DeleteUser(User user)
+        public void DeleteUser(User user)
         {
             Dal.DeleteUser(user);
 
-            var f = new {Id = 4, Name = "NAme"};
+            var f = new { Id = 4, Name = "NAme" };
         }
-
     }
 }
